@@ -34,6 +34,7 @@ class SonaGatewaySetup:
         self.bgpNeighborIp = CONF.DEFAULT.bgpNeighborIp
         self.asNum = CONF.DEFAULT.asNum
         self.peerAsNum = CONF.DEFAULT.peerAsNum
+        self.defaultExternalRouterMac = "fe:00:00:00:00:01"
     
     def createJson(self, portNumPatchRout, portNumQuagga):
     #Initialize
@@ -93,7 +94,7 @@ class SonaGatewaySetup:
 
         interfaceDict = dict()
         interfaceDict["ips"] = ipList
-        interfaceDict["mac"] = self.quaggaMac
+        interfaceDict["mac"] = self.defaultExternalRouterMac
         interfaceDict["name"] = "b1-2"
     
         interfaceList = list()

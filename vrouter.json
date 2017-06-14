@@ -2,7 +2,7 @@
     "apps": {
         "org.onosproject.router": {
             "router": {
-                "controlPlaneConnectPoint": "of:00000000000000b1/2",
+                "controlPlaneConnectPoint": "of:00000000000000b1/3",
                 "interfaces": [
                     "b1-1",
                     "b1-2"
@@ -48,7 +48,7 @@
                     "ips": [
                         "172.18.0.254/30"
                     ],
-                    "mac": "fe:00:00:00:00:01",
+                    "mac": "fe:00:00:00:00:03",
                     "name": "b1-1"
                 }
             ]
