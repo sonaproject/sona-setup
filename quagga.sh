@@ -73,11 +73,11 @@ else
 fi
 
 # clean up existing container with same name and IP
-sudo docker pull hyunsun/quagga-fpm
+sudo docker pull opensona/docker-quagga
 sudo docker stop $CONTAINER_NAME
 sudo docker rm $CONTAINER_NAME
 sudo ovs-vsctl del-port $PORT_NAME
 
-sudo docker run --privileged --cap-add=NET_ADMIN --cap-add=NET_RAW --name $CONTAINER_NAME --hostname $CONTAINER_NAME -d -v $VOLUME_DIR:/etc/quagga hyunsun/quagga-fpm
+sudo docker run --privileged --cap-add=NET_ADMIN --cap-add=NET_RAW --name $CONTAINER_NAME --hostname $CONTAINER_NAME -d -v $VOLUME_DIR:/etc/quagga opensona/docker-quagga
 sudo ~/sona-setup/pipework $BRIDGE_NAME -i eth1 -l $PORT_NAME $CONTAINER_NAME $ETH1_IP_CIDR $ETH1_MAC
 sudo docker exec -d $CONTAINER_NAME $POST_COMMAND

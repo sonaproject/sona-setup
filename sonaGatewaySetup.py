@@ -12,13 +12,13 @@ class SonaGatewaySetup:
         default_group = cfg.OptGroup(name='DEFAULT')
         default_conf = [cfg.StrOpt('routerBridge'),
             cfg.StrOpt('floatingCidr'),
-            cfg.StrOpt('quaggaMac'),
-            cfg.StrOpt('quaggaIp'),
+            cfg.StrOpt('localPeerMac'),
+            cfg.StrOpt('localPeerIp'),
             cfg.StrOpt('uplinkPortNum'),
-            cfg.StrOpt('gatewayName'),
+            cfg.StrOpt('vRouterName'),
             cfg.StrOpt('bgpNeighborIp'),
-            cfg.StrOpt('asNum'),
-            cfg.StrOpt('peerAsNum')]
+            cfg.StrOpt('localAsNum'),
+            cfg.StrOpt('remoteAsNum')]
     
     
         CONF.register_group(default_group)
@@ -27,13 +27,13 @@ class SonaGatewaySetup:
     
         self.routerBridge = CONF.DEFAULT.routerBridge
         self.floatingCidr = CONF.DEFAULT.floatingCidr.split(",")
-        self.quaggaMac = CONF.DEFAULT.quaggaMac
-        self.quaggaIp = CONF.DEFAULT.quaggaIp
+        self.localPeerMac = CONF.DEFAULT.localPeerMac
+        self.localPeerIp = CONF.DEFAULT.localPeerIp
         self.uplinkPortNum = CONF.DEFAULT.uplinkPortNum
-        self.gatewayName = CONF.DEFAULT.gatewayName
+        self.vRouterName = CONF.DEFAULT.vRouterName
         self.bgpNeighborIp = CONF.DEFAULT.bgpNeighborIp
-        self.asNum = CONF.DEFAULT.asNum
-        self.peerAsNum = CONF.DEFAULT.peerAsNum
+        self.localAsNum = CONF.DEFAULT.localAsNum
+        self.remoteAsNum = CONF.DEFAULT.remoteAsNum
         self.defaultExternalRouterMac = "fe:00:00:00:00:01"
     
     def createJson(self, portNumPatchRout, portNumQuagga):
@@ -107,10 +107,10 @@ class SonaGatewaySetup:
         portDict[self.routerBridge + "/" + str(portNumPatchRout)] = patchRoutInterfaceDict
     
         ipList = list()
-        ipList.append(self.quaggaIp)
+        ipList.append(self.localPeerIp)
         interfaceDict = dict()
         interfaceDict["ips"] = ipList
-        interfaceDict["mac"] = self.quaggaMac
+        interfaceDict["mac"] = self.localPeerMac
         interfaceDict["name"] = "b1-1"
     
         interfaceList = list()
@@ -129,12 +129,12 @@ class SonaGatewaySetup:
     
     def createBgpdConf(self):
         f = open("bgpd.conf", "w")
-        f.write("hostname %s\n" %self.gatewayName)
+        f.write("hostname %s\n" %self.vRouterName)
         f.write("password zebra\n\n")
-        f.write("router bgp %s\n" %self.asNum)
-        f.write("  bgp router-id %s\n" %self.quaggaIp.split("/")[0])
+        f.write("router bgp %s\n" %self.localAsNum)
+        f.write("  bgp router-id %s\n" %self.localPeerIp.split("/")[0])
         f.write("  timers bgp 3 9\n")
-        f.write("  neighbor %s remote-as %s\n" %(self.bgpNeighborIp.split("/")[0], self.peerAsNum))
+        f.write("  neighbor %s remote-as %s\n" %(self.bgpNeighborIp.split("/")[0], self.remoteAsNum))
         f.write("  neighbor %s ebgp-multihop\n" %self.bgpNeighborIp.split("/")[0])
         f.write("  neighbor %s timers connect 5\n" %self.bgpNeighborIp.split("/")[0])
         f.write("  neighbor %s advertisement-interval 5\n" %self.bgpNeighborIp.split("/")[0])
@@ -146,7 +146,7 @@ class SonaGatewaySetup:
 
     def createZebraConf(self, onosIp):
         f = open("zebra.conf", "w")
-        f.write("hostname %s\n" %self.gatewayName)
+        f.write("hostname %s\n" %self.vRouterName)
         f.write("password zebra\n\n")
         f.write("fpm connection ip %s port 2620\n" %onosIp)
         f.close()
@@ -166,14 +166,14 @@ class SonaGatewaySetup:
         f = open("bgpd.conf", "w")
         f.write("hostname %s\n" %quaggaRouterName)
         f.write("password zebra\n\n")
-        f.write("router bgp %s\n" %self.peerAsNum)
+        f.write("router bgp %s\n" %self.remoteAsNum)
         f.write("  bgp router-id %s\n" %self.bgpNeighborIp.split("/")[0])
         f.write("  timers bgp 3 9\n")
-        f.write("  neighbor %s remote-as %s\n" %(self.quaggaIp.split("/")[0], self.asNum))
-        f.write("  neighbor %s ebgp-multihop\n" %self.quaggaIp.split("/")[0])
-        f.write("  neighbor %s timers connect 5\n" %self.quaggaIp.split("/")[0])
-        f.write("  neighbor %s advertisement-interval 5\n" %self.quaggaIp.split("/")[0])
-        f.write("  neighbor %s default-originate\n\n" %self.quaggaIp.split("/")[0])
+        f.write("  neighbor %s remote-as %s\n" %(self.localPeerIp.split("/")[0], self.localAsNum))
+        f.write("  neighbor %s ebgp-multihop\n" %self.localPeerIp.split("/")[0])
+        f.write("  neighbor %s timers connect 5\n" %self.localPeerIp.split("/")[0])
+        f.write("  neighbor %s advertisement-interval 5\n" %self.localPeerIp.split("/")[0])
+        f.write("  neighbor %s default-originate\n\n" %self.localPeerIp.split("/")[0])
         f.write("log file /var/log/quagga/bgpd.log\n")
         f.close()
 

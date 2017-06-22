@@ -22,12 +22,12 @@ cat zebra.conf
 mv bgpd.conf ./volumes/gateway/bgpd.conf
 mv zebra.conf ./volumes/gateway/zebra.conf
 
-gatewayName=$(cat vRouterConfig.ini | grep gatewayName | awk '{print$3}' | sed "s/\"//g")
-quaggaIp=$(cat vRouterConfig.ini | grep quaggaIp | awk '{print$3}'| sed "s/\"//g")
-quaggaMac=$(cat vRouterConfig.ini | grep quaggaMac | awk '{print$3}'| sed "s/\"//g")
+vRouterName=$(cat vRouterConfig.ini | grep vRouterName | awk '{print$3}' | sed "s/\"//g")
+localPeerIp=$(cat vRouterConfig.ini | grep localPeerIp | awk '{print$3}'| sed "s/\"//g")
+localPeerMac=$(cat vRouterConfig.ini | grep localPeerMac | awk '{print$3}'| sed "s/\"//g")
 
-echo && echo "run /quagga.sh --name=$gatewayName --ip=$quaggaIp --mac=$quaggaMac"
-./quagga.sh --name=$gatewayName --ip=$quaggaIp --mac=$quaggaMac
+echo && echo "run /quagga.sh --name=$vRouterName --ip=$localPeerIp --mac=$localPeerMac"
+./quagga.sh --name=$vRouterName --ip=$localPeerIp --mac=$localPeerMac
 
 # Change controlPlaneConnectPoint in  vrouter.json 
 portNum=$(sudo ovs-ofctl dump-ports-desc br-router | grep quagga\) | awk -F'(' '{print $1}')
