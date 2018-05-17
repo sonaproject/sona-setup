@@ -18,8 +18,8 @@ fi
 echo && echo "externalRouterConfig.ini"
 cat externalRouterConfig.ini
 
-echo && echo "pulling opensona/docker-quagga"
-sudo docker pull opensona/docker-quagga
+echo && echo "pulling opensona/router-docker"
+sudo docker pull opensona/router-docker
 echo && echo "pulling done"
 
 echo && echo "deleting existing container and port" 
@@ -29,7 +29,7 @@ sudo ovs-vsctl del-port router
 echo && echo "deleting done"
 
 echo && echo "running external router container"
-sudo docker run --privileged --cap-add=NET_ADMIN --cap-add=NET_RAW --name router --hostname router -d opensona/docker-quagga
+sudo docker run --privileged --cap-add=NET_ADMIN --cap-add=NET_RAW --name router --hostname router -d opensona/router-docker
 sudo ~/sona-setup/pipework br-int -i eth1 -l router router $floatingCidr $externalPeerMac
 sudo docker exec -d router iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 echo && echo "running done"
